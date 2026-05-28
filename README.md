@@ -1,10 +1,10 @@
 # VAXUI — Panel Vax (React + Vite)
 
-Frontend del panel de administración (metas, pagos, ventas, simulador, alertas).
+Frontend del panel de administración. Conecta por defecto a la API en producción.
 
-## Requisitos
-
-- Node.js 18+
+| Entorno | URL UI | API |
+|---------|--------|-----|
+| Producción | [vax-ui.vercel.app](https://vax-ui.vercel.app) | [vaxback.onrender.com](https://vaxback.onrender.com) |
 
 ## Desarrollo local
 
@@ -14,24 +14,32 @@ npm install
 npm run dev
 ```
 
-Abre `http://localhost:5173`
+Abre `http://localhost:5173` — las peticiones van a `https://vaxback.onrender.com`.
 
-En `.env`:
+Para usar un backend local, edita `.env.development`:
 
 ```
 VITE_API_URL=http://localhost:8000
 ```
 
-La API debe estar corriendo en **VAXBACK** (mismo puerto u otra URL en producción).
+## Variables de entorno
 
-## Producción
+| Variable | Valor en producción |
+|----------|---------------------|
+| `VITE_API_URL` | `https://vaxback.onrender.com` |
 
-- Build: `npm run build`
-- Carpeta de salida: `dist`
-- Variable obligatoria: `VITE_API_URL` (URL pública del API, sin `/` al final)
+En **Vercel** → Settings → Environment Variables (Production): misma variable, por si se sobrescribe el build.
 
-Despliegue típico: [Vercel](https://vercel.com) conectado a este repo.
+Tras cambiar variables en Vercel: **Redeploy**.
+
+## Build
+
+```bash
+npm run build
+```
+
+Salida: `dist/`. El archivo `.env.production` ya define la API para el build.
 
 ## Repo relacionado
 
-Backend: repositorio **VAXBACK** en GitHub.
+Backend: [VAXBACK](https://github.com/AndyOjeda/VaxBack) en Render.
