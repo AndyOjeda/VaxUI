@@ -1,0 +1,383 @@
+.payments-page {
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
+.payments-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .payments-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--glass-shadow);
+}
+
+.summary-card-accent {
+  border-color: rgba(var(--accent-rgb), 0.25);
+  background: linear-gradient(145deg, rgba(var(--accent-rgb), 0.08) 0%, var(--glass-tint) 100%);
+}
+
+.payments-page.is-refreshing .payments-list {
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+
+.payments-page .payments-list {
+  transition: opacity 0.15s ease;
+}
+
+.summary-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.summary-card-accent .summary-value {
+  color: var(--accent);
+}
+
+.summary-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.progress-block {
+  margin-bottom: 1.25rem;
+  padding: 1.15rem 1.25rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.progress-header strong {
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+.progress-track {
+  height: 10px;
+  background: var(--bg-surface-hover);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.progress-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--glass-shadow);
+}
+
+.month-nav-btn {
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.month-nav-btn:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.month-nav-label {
+  text-align: center;
+  flex: 1;
+}
+
+.month-nav-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+}
+
+.month-nav-badge {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
+}
+
+.payments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.payment-list-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: var(--glass-tint);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.65rem 0.5rem 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow);
+}
+
+.payment-list-card:hover {
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-hover);
+}
+
+.payment-list-card:not(.is-paid):hover {
+  border-color: var(--accent-border);
+}
+
+.payment-list-card.is-paid {
+  opacity: 0.6;
+  background: var(--bg-elevated);
+}
+
+.payment-list-card.is-overdue:not(.is-paid) {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.payment-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  font-family: var(--font);
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.payment-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.payment-check.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.payment-list-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.payment-list-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.payment-list-concept {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.payment-list-card.is-paid .payment-list-concept {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.payment-list-amount {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.struck {
+  text-decoration: line-through;
+  color: var(--text-muted) !important;
+}
+
+.payment-list-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.payment-list-cat {
+  background: var(--bg-surface-hover);
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.payment-monthly-tag {
+  color: var(--accent);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--accent-dim);
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+}
+
+.payment-overdue-tag {
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.payment-action-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  transition: all 0.15s;
+}
+
+.payment-action-btn:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.payment-action-delete:hover {
+  color: var(--danger);
+  background: var(--danger-dim);
+}
+
+.payments-empty {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  flex: 1;
+}
+
+.payments-empty .btn {
+  margin-top: 1rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  width: auto;
+  accent-color: var(--accent);
+}

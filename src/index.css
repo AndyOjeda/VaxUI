@@ -1,0 +1,153 @@
+:root {
+  --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  --bg-base: #141418;
+  --bg-elevated: #1c1c22;
+  --bg-surface: #24242c;
+  --bg-surface-hover: #2e2e38;
+  --bg-input: #1a1a20;
+
+  --text-primary: #f4f4f8;
+  --text-secondary: #b4b4c0;
+  --text-muted: #7a7a8a;
+
+  --accent: #ff7722;
+  --accent-strong: #e86500;
+  --accent-rgb: 255, 119, 34;
+  --accent-dim: rgba(var(--accent-rgb), 0.12);
+  --accent-glow: rgba(var(--accent-rgb), 0.22);
+  --accent-border: rgba(var(--accent-rgb), 0.45);
+  --accent-text: #1a0a00;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.2);
+
+  --success: #ff7722;
+  --success-dim: rgba(var(--accent-rgb), 0.12);
+  --warning: #fbbf24;
+  --warning-dim: rgba(251, 191, 36, 0.14);
+  --danger: #f87171;
+  --danger-dim: rgba(248, 113, 113, 0.14);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --shadow-card: 0 0 0 1px var(--border), 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 48px rgba(var(--accent-rgb), 0.06);
+
+  /* Glass cálido — tinte naranja sobre fondo oscuro */
+  --glass-tint: rgba(38, 28, 22, 0.82);
+  --glass-bg: rgba(var(--accent-rgb), 0.05);
+  --glass-bg-solid: rgba(40, 30, 24, 0.92);
+  --glass-bg-strong: rgba(52, 36, 26, 0.88);
+  --glass-bg-dark: rgba(28, 20, 16, 0.72);
+  --glass-border: rgba(var(--accent-rgb), 0.12);
+  --glass-border-strong: rgba(var(--accent-rgb), 0.2);
+  --glass-blur: 12px;
+  --glass-saturate: 140%;
+  --glass-shadow: var(--shadow-card);
+  --glass-shadow-hover: 0 0 0 1px var(--border-strong), 0 12px 36px rgba(0, 0, 0, 0.38);
+  --glass-track: var(--bg-surface-hover);
+  --glass-track-border: rgba(255, 255, 255, 0.06);
+
+  --chart-grid: rgba(255, 255, 255, 0.08);
+  --chart-tick: #b4b4c0;
+  --chart-bar: #ff7722;
+  --chart-area: rgba(var(--accent-rgb), 0.28);
+  --chart-orange: #ff7722;
+  --chart-orange-light: #ff9a4d;
+  --chart-orange-dark: #e86500;
+
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 72px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-primary);
+  background: #141418;
+  background-image:
+    radial-gradient(ellipse 85% 55% at 95% 5%, rgba(var(--accent-rgb), 0.16), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 5% 95%, rgba(90, 60, 180, 0.1), transparent 50%),
+    radial-gradient(ellipse 55% 40% at 50% -5%, rgba(var(--accent-rgb), 0.1), transparent 55%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+.app-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+/* Utilidad glass reutilizable */
+.glass,
+.card {
+  position: relative;
+  background: var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-surface {
+  position: relative;
+  background: var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  .card,
+  .glass-surface {
+    background: var(--glass-bg-solid);
+  }
+}

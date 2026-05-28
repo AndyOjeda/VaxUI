@@ -1,0 +1,72 @@
+.alerts-page {
+  width: 100%;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.alert-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem 1.15rem;
+}
+
+.alert-card--warning {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: linear-gradient(145deg, rgba(251, 191, 36, 0.08) 0%, var(--glass-tint) 100%);
+}
+
+.alert-card--info {
+  border-color: rgba(var(--accent-rgb), 0.25);
+}
+
+.alert-card-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.alert-card--warning .alert-card-icon {
+  color: var(--warning);
+}
+
+.alert-card-body strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+.alert-card-body p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.alert-card-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.alert-card-link:hover {
+  text-decoration: underline;
+}
+
+.alerts-empty {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.alerts-empty-icon {
+  color: var(--accent);
+  opacity: 0.6;
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,76 @@
+.hover-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.hover-tooltip {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.hover-tooltip strong {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.hover-tooltip span {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+.hover-tooltip-wrap--right .hover-tooltip {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translate(-6px, -50%);
+}
+
+.hover-tooltip-wrap--top .hover-tooltip {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translate(-50%, 6px);
+}
+
+.hover-tooltip-wrap--bottom .hover-tooltip {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translate(-50%, -6px);
+}
+
+.hover-tooltip-wrap:hover .hover-tooltip,
+.hover-tooltip-wrap:focus-within .hover-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hover-tooltip-wrap--right:hover .hover-tooltip,
+.hover-tooltip-wrap--right:focus-within .hover-tooltip {
+  transform: translate(0, -50%);
+}
+
+.hover-tooltip-wrap--top:hover .hover-tooltip,
+.hover-tooltip-wrap--top:focus-within .hover-tooltip {
+  transform: translate(-50%, 0);
+}
+
+.hover-tooltip-wrap--bottom:hover .hover-tooltip,
+.hover-tooltip-wrap--bottom:focus-within .hover-tooltip {
+  transform: translate(-50%, 0);
+}

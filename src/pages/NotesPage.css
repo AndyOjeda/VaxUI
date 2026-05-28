@@ -1,0 +1,56 @@
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.note-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.note-card p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.note-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.note-tags {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.priority-badge-high {
+  background: var(--danger-dim);
+  color: var(--danger);
+}
+.priority-badge-medium {
+  background: var(--warning-dim);
+  color: var(--warning);
+}
+.priority-badge-low {
+  background: var(--bg-surface-hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.note-card.priority-high {
+  border-left: 3px solid var(--danger);
+}
