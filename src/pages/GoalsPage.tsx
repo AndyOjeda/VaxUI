@@ -99,8 +99,8 @@ export function GoalsPage() {
     setEditBaseProfit(parseFloat(m.base_profit));
   };
 
-  const editPayments = editMonth ? parseFloat(editMonth.payments_total) : 0;
-  const editTarget = editPayments + editBaseProfit;
+  const editPending = editMonth ? parseFloat(editMonth.payments_pending) : 0;
+  const editTarget = editPending + editBaseProfit;
   const editRemaining = editMonth ? parseFloat(editMonth.remaining) : 0;
   const editDaysLeft = editMonth ? daysLeftInMonth(editMonth.year, editMonth.month) : 1;
   const editDaily = editMonth ? dailyTarget(editRemaining, editMonth.year, editMonth.month) : 0;
@@ -136,7 +136,7 @@ export function GoalsPage() {
         <div>
           <h1>Metas {year}</h1>
           <p>
-            Meta = pagos del mes + ganancia base (por defecto {formatCurrency(DEFAULT_BASE_PROFIT)})
+            Meta = por pagar del mes + ganancia base (por defecto {formatCurrency(DEFAULT_BASE_PROFIT)})
             {isCurrentYear && ` · Desde ${formatMonthName(fromMonth)}`}
           </p>
         </div>
@@ -149,16 +149,16 @@ export function GoalsPage() {
 
       <div className="goals-grid">
         {visibleMonths.map((m) => {
-          const pct = Math.min(parseFloat(m.percent_complete), 100);
-          const target = parseFloat(m.target_amount);
-          const payments = parseFloat(m.payments_total);
+          const hasData = months.some((x) => x.month === m.month);
           const base = parseFloat(m.base_profit);
-          const remaining = parseFloat(m.remaining);
           const pendingPay = parseFloat(m.payments_pending);
+          const target = pendingPay + base;
+          const profit = parseFloat(m.profit);
+          const remaining = Math.max(target - profit, 0);
+          const pct = target > 0 ? Math.min((profit / target) * 100, 100) : 0;
           const daysLeft = daysLeftInMonth(year, m.month);
           const perDay = dailyTarget(remaining, year, m.month);
           const showDaily = isCurrentYear && (m.month >= currentMonth || year > currentYear) && remaining > 0;
-          const hasData = months.some((x) => x.month === m.month);
           const isRefreshing = loading && !hasData;
           const isCurrent = isCurrentYear && m.month === currentMonth;
           return (
@@ -182,24 +182,26 @@ export function GoalsPage() {
                     <Pencil size={14} />
                   </button>
                 </div>
-                <strong className="goal-h-target">{isRefreshing ? '…' : formatCurrency(remaining)}</strong>
+                <strong className="goal-h-target">{isRefreshing ? '…' : formatCurrency(target)}</strong>
                 <p className="goal-h-formula">
-                  {isRefreshing ? '…' : `${formatCurrency(payments)} pagos + ${formatCurrency(base)} base`}
+                  {isRefreshing ? '…' : `${formatCurrency(pendingPay)} por pagar + ${formatCurrency(base)} base`}
                 </p>
-                <p className="goal-h-pending">
-                  {isRefreshing ? '…' : `Por pagar ${formatCurrency(pendingPay)}`}
-                </p>
-                <p className="goal-h-total">
-                  {isRefreshing ? 'Cargando…' : `Total ${formatCurrency(target)}`}
-                </p>
+                {!isRefreshing && profit > 0 && remaining > 0 && (
+                  <p className="goal-h-total">Faltan {formatCurrency(remaining)} en ganancia</p>
+                )}
+                {!isRefreshing && profit > 0 && remaining <= 0 && (
+                  <p className="goal-h-total goal-h-total--done">Meta cumplida</p>
+                )}
               </div>
               <div className="goal-h-ring">
                 {showDaily && !isRefreshing ? (
                   <HoverTooltip
+                    placement="top"
                     content={
                       <>
                         <strong>{formatCurrency(perDay)}</strong>
-                        <span>por día · {daysLeft} días restantes</span>
+                        <span>por día</span>
+                        <span>{daysLeft} días restantes</span>
                       </>
                     }
                   >
@@ -218,7 +220,7 @@ export function GoalsPage() {
         open={!!editMonth}
         onClose={() => setEditMonth(null)}
         title={editMonth ? `Meta ${formatMonthName(editMonth.month)} ${editMonth.year}` : ''}
-        subtitle="La meta se calcula con los pagos del mes más la ganancia base"
+        subtitle="La meta se calcula con lo por pagar del mes más la ganancia base"
       >
         {editMonth && (
           <form onSubmit={saveGoal}>
@@ -230,8 +232,8 @@ export function GoalsPage() {
               </p>
             </div>
             <div className="form-group">
-              <label>Pagos del mes</label>
-              <p className="goal-edit-readonly">{formatCurrency(editMonth.payments_total)}</p>
+              <label>Por pagar del mes</label>
+              <p className="goal-edit-readonly">{formatCurrency(editMonth.payments_pending)}</p>
             </div>
             <div className="form-group">
               <label>Ganancia base (COP)</label>
@@ -241,7 +243,7 @@ export function GoalsPage() {
               <label>Meta total del mes</label>
               <p className="goal-edit-total">{formatCurrency(editTarget)}</p>
               <p className="goal-edit-info">
-                {formatCurrency(editMonth.payments_total)} + {formatCurrency(editBaseProfit)}
+                {formatCurrency(editMonth.payments_pending)} + {formatCurrency(editBaseProfit)}
               </p>
             </div>
             <div className="goal-edit-actions">

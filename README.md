@@ -14,9 +14,9 @@ npm install
 npm run dev
 ```
 
-Abre `http://localhost:5173` — las peticiones van a `https://vaxback.onrender.com`.
+Abre `http://localhost:5173` — en desarrollo las peticiones van a `https://vaxback.onrender.com` (`.env.development`).
 
-Para usar un backend local, edita `.env.development`:
+Para probar un backend local (opcional), cambia en `.env.development`:
 
 ```
 VITE_API_URL=http://localhost:8000

@@ -121,7 +121,7 @@ export function DashboardPage() {
             </div>
             <div className="goal-bar"><div className="goal-bar-fill" style={{ width: `${goalPct}%` }} /></div>
             <span className="goal-row-pct">
-              {goalPct.toFixed(0)}% · {formatCurrency(monthGoal.payments_total)} pagos + {formatCurrency(monthGoal.base_profit)} base · faltan {formatCurrency(monthGoal.remaining)}
+              {goalPct.toFixed(0)}% · {formatCurrency(monthGoal.payments_pending)} por pagar + {formatCurrency(monthGoal.base_profit)} base · faltan {formatCurrency(monthGoal.remaining)}
             </span>
           </div>
         </div>
@@ -179,7 +179,7 @@ export function DashboardPage() {
         ) : (
           <div className="goal-row">
             <p>Meta total: <strong>{formatCurrency(monthGoal.target_amount)}</strong></p>
-            <p>{formatCurrency(monthGoal.payments_total)} pagos + {formatCurrency(monthGoal.base_profit)} base</p>
+            <p>{formatCurrency(monthGoal.payments_pending)} por pagar + {formatCurrency(monthGoal.base_profit)} base</p>
             <p>Faltan {formatCurrency(monthGoal.remaining)} ({goalPct.toFixed(0)}% avance)</p>
             <div className="goal-bar"><div className="goal-bar-fill" style={{ width: `${goalPct}%` }} /></div>
           </div>
