@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu } from 'lucide-react';
+import { APP_NAME } from '../../config/brand';
 import { LayoutProvider, useLayout } from '../../context/LayoutContext';
 import { DataProvider } from '../../context/DataContext';
 import { prefetchInitialData } from '../../utils/routePrefetch';
@@ -11,6 +12,7 @@ function Shell() {
   const { sidebarCollapsed, toggleSidebar } = useLayout();
 
   useEffect(() => {
+    document.title = APP_NAME;
     prefetchInitialData();
   }, []);
 
@@ -27,7 +29,7 @@ function Shell() {
           <button type="button" className="sidebar-toggle" onClick={toggleSidebar} aria-label="Menú">
             <Menu size={20} />
           </button>
-          <span className="top-bar-title">Vax · Celulares</span>
+          <span className="top-bar-title">{APP_NAME}</span>
         </header>
         <main className="main-content">
           <Outlet />

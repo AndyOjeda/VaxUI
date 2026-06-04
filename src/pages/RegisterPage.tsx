@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { Banknote } from 'lucide-react';
+import { APP_NAME } from '../config/brand';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css';
 
@@ -10,6 +12,10 @@ export function RegisterPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    document.title = `Crear cuenta · ${APP_NAME}`;
+  }, []);
 
   if (!loading && user) return <Navigate to="/dashboard" replace />;
 
@@ -30,8 +36,11 @@ export function RegisterPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <div className="brand-icon">V</div>
-          <h1>Crear cuenta</h1>
+          <div className="brand-icon" aria-hidden="true">
+            <Banknote size={22} strokeWidth={2.25} />
+          </div>
+          <h1>{APP_NAME}</h1>
+          <p className="auth-register-sub">Crear cuenta</p>
           <p>El primer usuario será administrador</p>
         </div>
         {error && <div className="alert alert-error">{error}</div>}

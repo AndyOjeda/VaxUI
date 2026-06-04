@@ -8,7 +8,9 @@ import {
   Bell,
   ChevronLeft,
   LogOut,
+  Banknote,
 } from 'lucide-react';
+import { APP_NAME } from '../../config/brand';
 import { useAuth } from '../../context/AuthContext';
 import { useLayout } from '../../context/LayoutContext';
 import { useAlertsCount } from '../../hooks/useAlertsCount';
@@ -33,8 +35,10 @@ export function Sidebar() {
     <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-top">
         <div className="sidebar-brand">
-          <div className="brand-icon">V</div>
-          {!sidebarCollapsed && <span>VAX</span>}
+          <div className="brand-icon" aria-hidden="true">
+            <Banknote size={18} strokeWidth={2.25} />
+          </div>
+          {!sidebarCollapsed && <span>{APP_NAME}</span>}
         </div>
         <button type="button" className="collapse-btn" onClick={toggleSidebar} aria-label="Colapsar menú">
           <ChevronLeft size={18} className={sidebarCollapsed ? 'flipped' : ''} />
