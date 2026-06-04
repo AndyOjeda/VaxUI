@@ -93,6 +93,30 @@ export interface Payment {
   created_at: string;
 }
 
+export interface Debt {
+  id: number;
+  concept: string;
+  total_amount: string;
+  amount_paid: string;
+  remaining: string;
+  recurring_template_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DebtSuggestion {
+  concept: string;
+  amount: string;
+  recurring_template_id: number | null;
+}
+
+export interface DebtsSummary {
+  debts: Debt[];
+  total_remaining: string;
+  recommended_monthly: string;
+  target_months: number;
+}
+
 export interface MonthlySalesStat {
   month: number;
   year: number;

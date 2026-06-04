@@ -381,3 +381,219 @@
   width: auto;
   accent-color: var(--accent);
 }
+
+.apply-all-row {
+  padding: 0.65rem 0.75rem;
+  background: rgba(var(--accent-rgb), 0.06);
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
+  border-radius: var(--radius-md);
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.debts-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.debts-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 520px) {
+  .debts-summary-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.debts-summary-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-tint);
+  color: var(--accent);
+}
+
+.debts-summary-card strong {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.debts-summary-accent {
+  border-color: rgba(var(--accent-rgb), 0.3);
+  background: linear-gradient(145deg, rgba(var(--accent-rgb), 0.1) 0%, var(--glass-tint) 100%);
+}
+
+.debts-summary-label {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.debts-target-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.debts-target-row label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.debts-target-row input {
+  width: 5rem;
+  text-align: center;
+}
+
+.debts-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.debts-suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.debts-suggestion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.debts-suggestion-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.debts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.debts-item {
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.debts-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.debts-item-concept {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.debts-item-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-surface);
+  margin-bottom: 0.85rem;
+  overflow: hidden;
+}
+
+.debts-item-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), rgba(var(--accent-rgb), 0.6));
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+
+.debts-item-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.debts-save-field-btn {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.debts-save-field-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .debts-item-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.debts-item-remaining {
+  text-align: right;
+  min-width: 6rem;
+}
+
+.debts-item-remaining span {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.debts-item-remaining strong {
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.debts-empty {
+  margin: 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}

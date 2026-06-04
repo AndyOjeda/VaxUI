@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, ChevronLeft, ChevronRight, Check, Pencil, Wallet, CircleDollarSign, Percent } from 'lucide-react';
+import { Plus, Trash2, ChevronLeft, ChevronRight, Check, Pencil, Wallet, CircleDollarSign, Percent, Landmark } from 'lucide-react';
+import { DebtsDialog } from '../components/payments/DebtsDialog';
 import { Dialog } from '../components/ui/Dialog';
 import { MoneyInput } from '../components/ui/MoneyInput';
 import { Spinner } from '../components/ui/Spinner';
@@ -43,9 +44,21 @@ interface PaymentFormProps {
   onSubmit: (e: React.FormEvent) => void;
   submitLabel: string;
   saving?: boolean;
+  isRecurringEdit?: boolean;
+  applyToAll?: boolean;
+  onApplyToAllChange?: (v: boolean) => void;
 }
 
-function PaymentForm({ form, setForm, onSubmit, submitLabel, saving }: PaymentFormProps) {
+function PaymentForm({
+  form,
+  setForm,
+  onSubmit,
+  submitLabel,
+  saving,
+  isRecurringEdit,
+  applyToAll,
+  onApplyToAllChange,
+}: PaymentFormProps) {
   return (
     <form onSubmit={onSubmit}>
       <div className="form-row">
@@ -76,6 +89,12 @@ function PaymentForm({ form, setForm, onSubmit, submitLabel, saving }: PaymentFo
           <input type="number" min={1} max={28} value={form.recurring_day} onChange={(e) => setForm({ ...form, recurring_day: e.target.value })} />
         </div>
       )}
+      {isRecurringEdit && onApplyToAllChange && (
+        <label className="checkbox-row apply-all-row">
+          <input type="checkbox" checked={!!applyToAll} onChange={(e) => onApplyToAllChange(e.target.checked)} />
+          Afectar todos los meses (plantilla y futuros)
+        </label>
+      )}
       <button type="submit" className="btn btn-primary" disabled={saving}>{submitLabel}</button>
     </form>
   );
@@ -90,7 +109,9 @@ export function PaymentsPage() {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
   const [createOpen, setCreateOpen] = useState(false);
+  const [debtsOpen, setDebtsOpen] = useState(false);
   const [editPayment, setEditPayment] = useState<Payment | null>(null);
+  const [applyToAllRecurring, setApplyToAllRecurring] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -165,6 +186,7 @@ export function PaymentsPage() {
 
   const openEdit = (p: Payment, e: React.MouseEvent) => {
     e.stopPropagation();
+    setApplyToAllRecurring(false);
     setEditPayment(p);
     setForm({
       concept: p.concept,
@@ -221,13 +243,17 @@ export function PaymentsPage() {
     if (!editPayment || !validateForm()) return;
     setSaving(true);
     try {
+      const isRecurring =
+        !!editPayment.recurring_template_id || recurringConcepts.has(editPayment.concept);
       await api.put(`/api/payments/${editPayment.id}`, {
         concept: form.concept.trim(),
         amount: form.amount,
         due_date: form.due_date,
         category: form.category || null,
+        apply_to_all_recurring: isRecurring && applyToAllRecurring,
       });
       setEditPayment(null);
+      setApplyToAllRecurring(false);
       setForm(emptyForm);
       await afterMutation();
       showToast('Pago actualizado correctamente');
@@ -264,9 +290,14 @@ export function PaymentsPage() {
           <h1>Pagos</h1>
           <p>{paidCount}/{sorted.length} completados este mes</p>
         </div>
-        <button type="button" className="btn btn-primary" onClick={openCreate}>
-          <Plus size={16} /> Agregar
-        </button>
+        <div className="page-header-actions">
+          <button type="button" className="btn btn-secondary" onClick={() => setDebtsOpen(true)}>
+            <Landmark size={16} /> Deudas
+          </button>
+          <button type="button" className="btn btn-primary" onClick={openCreate}>
+            <Plus size={16} /> Agregar
+          </button>
+        </div>
       </div>
 
       <div className="month-nav">
@@ -371,9 +402,32 @@ export function PaymentsPage() {
         <PaymentForm form={form} setForm={setForm} onSubmit={handleCreate} submitLabel="Guardar pago" saving={saving} />
       </Dialog>
 
-      <Dialog open={!!editPayment} onClose={() => setEditPayment(null)} title="Editar pago" subtitle={editPayment?.concept} wide>
-        <PaymentForm form={form} setForm={setForm} onSubmit={handleEdit} submitLabel="Guardar cambios" saving={saving} />
+      <Dialog
+        open={!!editPayment}
+        onClose={() => { setEditPayment(null); setApplyToAllRecurring(false); }}
+        title="Editar pago"
+        subtitle={
+          editPayment && (editPayment.recurring_template_id || recurringConcepts.has(editPayment.concept))
+            ? `${editPayment.concept} · Solo este mes salvo que marques afectar todos`
+            : editPayment?.concept
+        }
+        wide
+      >
+        <PaymentForm
+          form={form}
+          setForm={setForm}
+          onSubmit={handleEdit}
+          submitLabel="Guardar cambios"
+          saving={saving}
+          isRecurringEdit={
+            !!editPayment && (!!editPayment.recurring_template_id || recurringConcepts.has(editPayment.concept))
+          }
+          applyToAll={applyToAllRecurring}
+          onApplyToAllChange={setApplyToAllRecurring}
+        />
       </Dialog>
+
+      <DebtsDialog open={debtsOpen} onClose={() => setDebtsOpen(false)} />
     </div>
   );
 }
