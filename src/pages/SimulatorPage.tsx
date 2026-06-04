@@ -128,11 +128,9 @@ export function SimulatorPage() {
     setEditTarget(draft);
     if (draft.sale_type === 'cambio') {
       setEditMyModel(draft.phone_model || draft.title);
-      setEditMyBuyPrice(parseFloat(draft.total_cost));
-      setEditSellToClient(
-        draft.items[0] ? parseFloat(draft.items[0].sell_price) : parseFloat(draft.total_revenue),
-      );
-      setEditCash(parseFloat(draft.cash_adjustment || '0'));
+      setEditMyBuyPrice(+draft.total_cost);
+      setEditSellToClient(draft.items[0] ? +draft.items[0].sell_price : +draft.total_revenue);
+      setEditCash(+(draft.cash_adjustment ?? 0));
       setEditTradeIns(parseTradeInsFromNotes(draft.notes));
     } else {
       setEditPhoneModel(draft.phone_model || draft.title);
