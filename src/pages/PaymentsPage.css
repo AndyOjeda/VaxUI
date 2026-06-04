@@ -268,16 +268,31 @@
   min-width: 0;
 }
 
-.payment-list-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.75rem;
-}
-
 .payment-list-concept {
+  display: block;
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+.payment-list-end {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.payment-list-amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.12rem;
+  min-width: 6.5rem;
+  text-align: right;
+}
+
+.payment-list-amounts.is-paid {
+  opacity: 0.85;
 }
 
 .payment-list-card.is-paid .payment-list-concept {
@@ -330,8 +345,40 @@
   font-size: 0.7rem;
 }
 
+.payment-list-abono {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.2;
+}
+
+.payment-list-remaining {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--warning);
+  line-height: 1.2;
+}
+
+.payment-abono-hint,
+.payment-abono-preview {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.payment-abono-preview strong {
+  color: var(--warning);
+}
+
+.goal-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .payment-actions {
   display: flex;
+  align-items: center;
   gap: 0.15rem;
   flex-shrink: 0;
 }
@@ -350,6 +397,11 @@
 .payment-action-btn:hover {
   color: var(--accent);
   background: var(--accent-dim);
+}
+
+.payment-action-abono:hover {
+  color: var(--warning);
+  background: rgba(251, 191, 36, 0.12);
 }
 
 .payment-action-delete:hover {

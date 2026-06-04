@@ -122,7 +122,8 @@ export function GoalsPage() {
       await load({ silent: true });
       showToast('Meta guardada correctamente');
     } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Error al guardar meta', 'error');
+      const msg = err instanceof Error ? err.message : 'Error al guardar meta';
+      showToast(msg.includes('greater than') ? 'La ganancia base debe ser 0 o mayor' : msg, 'error');
     }
   };
 
@@ -237,7 +238,8 @@ export function GoalsPage() {
             </div>
             <div className="form-group">
               <label>Ganancia base (COP)</label>
-              <MoneyInput value={editBaseProfit} onChange={setEditBaseProfit} required />
+              <MoneyInput value={editBaseProfit} onChange={setEditBaseProfit} placeholder="0 si no esperas ganancia extra" />
+              <p className="goal-edit-info">Puedes usar 0 si este mes solo quieres cubrir lo por pagar.</p>
             </div>
             <div className="form-group">
               <label>Meta total del mes</label>

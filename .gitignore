@@ -1,6 +1,8 @@
 node_modules/
 dist/
 .env
+.env.local
+.env.development.local
 .DS_Store
 .vite/
 *.local

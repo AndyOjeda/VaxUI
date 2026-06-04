@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeftRight, DollarSign, Plus, Trash2, Save, CheckCircle2 } from 'lucide-react';
+import { ArrowLeftRight, DollarSign, Plus, Trash2, Save, CheckCircle2, Pencil } from 'lucide-react';
 import { calculateTradeProfit, type TradeInPhone } from '../utils/simulator';
-import { buildVentaDraftPayload, buildCambioDraftPayload } from '../utils/saleRecords';
+import {
+  buildVentaDraftPayload,
+  buildCambioDraftPayload,
+  buildVentaDraftUpdate,
+  buildCambioDraftUpdate,
+  parseTradeInsFromNotes,
+} from '../utils/saleRecords';
 import { calcVentaDirecta, ensureDefaultBusiness, formatCurrency, formatDate, formatPercent } from '../utils/format';
 import { MoneyInput } from '../components/ui/MoneyInput';
 import { Dialog } from '../components/ui/Dialog';
@@ -26,6 +32,16 @@ export function SimulatorPage() {
   const [loadingBusiness, setLoadingBusiness] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<ProfitabilityRecord | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [editTarget, setEditTarget] = useState<ProfitabilityRecord | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editPhoneModel, setEditPhoneModel] = useState('');
+  const [editBuyPrice, setEditBuyPrice] = useState(0);
+  const [editSellPrice, setEditSellPrice] = useState(0);
+  const [editMyModel, setEditMyModel] = useState('');
+  const [editMyBuyPrice, setEditMyBuyPrice] = useState(0);
+  const [editSellToClient, setEditSellToClient] = useState(0);
+  const [editCash, setEditCash] = useState(0);
+  const [editTradeIns, setEditTradeIns] = useState<TradeInPhone[]>([emptyTradeIn()]);
 
   const [phoneModel, setPhoneModel] = useState('');
   const [buyPrice, setBuyPrice] = useState(0);
@@ -98,11 +114,71 @@ export function SimulatorPage() {
   };
 
   const completeDraft = async (id: number) => {
-    await api.post(`/api/profitability/${id}/complete`, {});
-    if (mode) loadDrafts(mode);
-    refreshAll();
-    showToast('Venta marcada como completada');
+    try {
+      await api.post(`/api/profitability/${id}/complete`, {});
+      if (mode) loadDrafts(mode);
+      refreshAll();
+      showToast('Venta marcada como completada');
+    } catch {
+      showToast('Error al completar la venta', 'error');
+    }
   };
+
+  const openEditDraft = (draft: ProfitabilityRecord) => {
+    setEditTarget(draft);
+    if (draft.sale_type === 'cambio') {
+      setEditMyModel(draft.phone_model || draft.title);
+      setEditMyBuyPrice(parseFloat(draft.total_cost));
+      setEditSellToClient(
+        draft.items[0] ? parseFloat(draft.items[0].sell_price) : parseFloat(draft.total_revenue),
+      );
+      setEditCash(parseFloat(draft.cash_adjustment || '0'));
+      setEditTradeIns(parseTradeInsFromNotes(draft.notes));
+    } else {
+      setEditPhoneModel(draft.phone_model || draft.title);
+      setEditBuyPrice(parseFloat(draft.total_cost));
+      setEditSellPrice(parseFloat(draft.total_revenue));
+    }
+  };
+
+  const updateEditTradeIn = (index: number, patch: Partial<TradeInPhone>) => {
+    setEditTradeIns((prev) => prev.map((x, j) => (j === index ? { ...x, ...patch } : x)));
+  };
+
+  const saveEditDraft = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTarget) return;
+    setEditSaving(true);
+    try {
+      const body =
+        editTarget.sale_type === 'cambio'
+          ? buildCambioDraftUpdate(
+              editMyModel,
+              editMyBuyPrice,
+              editSellToClient,
+              editCash,
+              editTradeIns,
+            )
+          : buildVentaDraftUpdate(editPhoneModel, editBuyPrice, editSellPrice);
+      await api.put(`/api/profitability/${editTarget.id}`, body);
+      setEditTarget(null);
+      if (mode) loadDrafts(mode);
+      refreshAll();
+      showToast('Cifras actualizadas');
+    } catch {
+      showToast('Error al guardar cambios', 'error');
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  const editVentaPreview = calcVentaDirecta(editBuyPrice, editSellPrice);
+  const editCambioPreview = calculateTradeProfit({
+    buyPrice: editMyBuyPrice,
+    sellPriceToClient: editSellToClient,
+    cashFromCustomer: editCash,
+    tradeIns: editTradeIns,
+  });
 
   const confirmDeleteDraft = async () => {
     if (!deleteTarget) return;
@@ -149,8 +225,11 @@ export function SimulatorPage() {
                   <td><span className="badge badge-pending">Pendiente</span></td>
                   <td>{formatDate(d.created_at.slice(0, 10))}</td>
                   <td className="table-actions">
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEditDraft(d)}>
+                      <Pencil size={14} /> Editar
+                    </button>
                     <button type="button" className="btn btn-primary btn-sm" onClick={() => completeDraft(d.id)}>
-                      <CheckCircle2 size={14} /> Completado
+                      <CheckCircle2 size={14} /> Completar
                     </button>
                     <button type="button" className="btn btn-danger btn-sm" onClick={() => setDeleteTarget(d)} aria-label="Eliminar">
                       <Trash2 size={14} />
@@ -310,6 +389,106 @@ export function SimulatorPage() {
       </div>
 
       <DraftTable type={mode} />
+
+      <Dialog
+        open={!!editTarget}
+        onClose={() => !editSaving && setEditTarget(null)}
+        title="Editar antes de completar"
+        subtitle={editTarget ? (editTarget.phone_model || editTarget.title) : ''}
+        wide
+      >
+        {editTarget && (
+          <form onSubmit={saveEditDraft} className="sim-edit-form">
+            {editTarget.sale_type === 'cambio' ? (
+              <>
+                <div className="form-group">
+                  <label>Modelo (tu celular)</label>
+                  <input value={editMyModel} onChange={(e) => setEditMyModel(e.target.value)} />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Precio compra</label>
+                    <MoneyInput value={editMyBuyPrice} onChange={setEditMyBuyPrice} />
+                  </div>
+                  <div className="form-group">
+                    <label>Precio venta a cliente</label>
+                    <MoneyInput value={editSellToClient} onChange={setEditSellToClient} />
+                  </div>
+                  <div className="form-group">
+                    <label>Efectivo del cliente</label>
+                    <MoneyInput value={editCash} onChange={setEditCash} />
+                  </div>
+                </div>
+                <h4 className="section-title">Celulares recibidos</h4>
+                {editTradeIns.map((t, i) => (
+                  <div key={i} className="trade-in-block">
+                    <div className="trade-in-row">
+                      <div className="form-group">
+                        <label>Modelo</label>
+                        <input value={t.model} onChange={(e) => updateEditTradeIn(i, { model: e.target.value })} />
+                      </div>
+                      <div className="form-group">
+                        <label>Precio recibido</label>
+                        <MoneyInput value={t.receivedPrice} onChange={(v) => updateEditTradeIn(i, { receivedPrice: v })} />
+                      </div>
+                      <div className="form-group">
+                        <label>Precio reventa</label>
+                        <MoneyInput value={t.resalePrice} onChange={(v) => updateEditTradeIn(i, { resalePrice: v })} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {editTradeIns.length < 3 && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setEditTradeIns((p) => [...p, emptyTradeIn()])}
+                  >
+                    <Plus size={14} /> Agregar celular
+                  </button>
+                )}
+                <p className="goal-edit-info">
+                  Ganancia estimada:{' '}
+                  <strong className="sale-profit">{formatCurrency(editCambioPreview.totalProfit)}</strong>
+                  {' · '}
+                  {formatPercent(editCambioPreview.marginPercent)}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label>Modelo del celular</label>
+                  <input value={editPhoneModel} onChange={(e) => setEditPhoneModel(e.target.value)} />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Precio compra</label>
+                    <MoneyInput value={editBuyPrice} onChange={setEditBuyPrice} />
+                  </div>
+                  <div className="form-group">
+                    <label>Precio venta cliente</label>
+                    <MoneyInput value={editSellPrice} onChange={setEditSellPrice} />
+                  </div>
+                </div>
+                <p className="goal-edit-info">
+                  Ganancia estimada:{' '}
+                  <strong className={editVentaPreview.profit >= 0 ? 'sale-profit' : 'text-danger'}>
+                    {formatCurrency(editVentaPreview.profit)}
+                  </strong>
+                </p>
+              </>
+            )}
+            <div className="goal-edit-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setEditTarget(null)} disabled={editSaving}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={editSaving}>
+                {editSaving ? 'Guardando…' : 'Guardar cambios'}
+              </button>
+            </div>
+          </form>
+        )}
+      </Dialog>
 
       <Dialog
         open={!!deleteTarget}

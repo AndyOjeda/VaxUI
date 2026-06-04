@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, ChevronLeft, ChevronRight, Check, Pencil, Wallet, CircleDollarSign, Percent, Landmark } from 'lucide-react';
-import { DebtsDialog } from '../components/payments/DebtsDialog';
+import { Plus, Trash2, ChevronLeft, ChevronRight, Check, Pencil, Wallet, CircleDollarSign, Percent, Banknote } from 'lucide-react';
 import { Dialog } from '../components/ui/Dialog';
 import { MoneyInput } from '../components/ui/MoneyInput';
 import { Spinner } from '../components/ui/Spinner';
@@ -19,6 +18,7 @@ import {
   sortPayments,
 } from '../utils/paymentsCache';
 import { invalidateMonthsOverviewCache } from '../utils/monthsOverviewCache';
+import { getAbonoTotal, serializePaymentNotes } from '../utils/paymentNotes';
 import type { Payment } from '../types';
 import './PaymentsPage.css';
 
@@ -109,12 +109,14 @@ export function PaymentsPage() {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
   const [createOpen, setCreateOpen] = useState(false);
-  const [debtsOpen, setDebtsOpen] = useState(false);
   const [editPayment, setEditPayment] = useState<Payment | null>(null);
   const [applyToAllRecurring, setApplyToAllRecurring] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [abonoTarget, setAbonoTarget] = useState<Payment | null>(null);
+  const [abonoAmount, setAbonoAmount] = useState(0);
+  const [abonoSaving, setAbonoSaving] = useState(false);
 
   const loadMonth = useCallback(async (m: number, y: number, opts?: { silent?: boolean }) => {
     const cached = getCachedPayments(m, y);
@@ -264,6 +266,39 @@ export function PaymentsPage() {
     }
   };
 
+  const openAbono = (p: Payment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setAbonoTarget(p);
+    setAbonoAmount(getAbonoTotal(p.notes));
+  };
+
+  const saveAbono = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!abonoTarget) return;
+    const total = parseFloat(abonoTarget.amount);
+    if (abonoAmount < 0) {
+      showToast('Ingresa un abono válido', 'error');
+      return;
+    }
+    if (abonoAmount > total) {
+      showToast('El abono no puede superar el monto del pago', 'error');
+      return;
+    }
+    setAbonoSaving(true);
+    try {
+      await api.put(`/api/payments/${abonoTarget.id}`, {
+        notes: serializePaymentNotes({ abono_total: abonoAmount }, abonoTarget.notes),
+      });
+      setAbonoTarget(null);
+      await afterMutation();
+      showToast(abonoAmount > 0 ? 'Abono registrado' : 'Abono eliminado');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Error al guardar abono', 'error');
+    } finally {
+      setAbonoSaving(false);
+    }
+  };
+
   const handleDelete = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
@@ -290,14 +325,9 @@ export function PaymentsPage() {
           <h1>Pagos</h1>
           <p>{paidCount}/{sorted.length} completados este mes</p>
         </div>
-        <div className="page-header-actions">
-          <button type="button" className="btn btn-secondary" onClick={() => setDebtsOpen(true)}>
-            <Landmark size={16} /> Deudas
-          </button>
-          <button type="button" className="btn btn-primary" onClick={openCreate}>
-            <Plus size={16} /> Agregar
-          </button>
-        </div>
+        <button type="button" className="btn btn-primary" onClick={openCreate}>
+          <Plus size={16} /> Agregar
+        </button>
       </div>
 
       <div className="month-nav">
@@ -359,6 +389,9 @@ export function PaymentsPage() {
           const isPaid = p.status === 'paid';
           const isOverdue = p.status === 'overdue';
           const isMonthly = recurringConcepts.has(p.concept);
+          const totalAmount = parseFloat(p.amount);
+          const abono = getAbonoTotal(p.notes);
+          const remaining = Math.max(totalAmount - abono, 0);
           return (
             <div key={p.id} className={`payment-list-card ${isPaid ? 'is-paid' : ''} ${isOverdue ? 'is-overdue' : ''}`}>
               <button type="button" className="payment-toggle" onClick={() => togglePaid(p)}>
@@ -366,10 +399,7 @@ export function PaymentsPage() {
                   {isPaid && <Check size={14} strokeWidth={3} />}
                 </span>
                 <div className="payment-list-body">
-                  <div className="payment-list-top">
-                    <span className="payment-list-concept">{p.concept}</span>
-                    <span className={`payment-list-amount ${isPaid ? 'struck' : ''}`}>{formatCurrency(p.amount)}</span>
-                  </div>
+                  <span className="payment-list-concept">{p.concept}</span>
                   <div className="payment-list-meta">
                     <span className={isPaid ? 'struck' : ''}>{formatDate(p.due_date)}</span>
                     {p.category && <span className="payment-list-cat">{p.category}</span>}
@@ -378,13 +408,27 @@ export function PaymentsPage() {
                   </div>
                 </div>
               </button>
-              <div className="payment-actions">
-                <button type="button" className="payment-action-btn" onClick={(e) => openEdit(p, e)} aria-label="Editar">
-                  <Pencil size={15} />
-                </button>
-                <button type="button" className="payment-action-btn payment-action-delete" onClick={(e) => handleDelete(p.id, e)} aria-label="Eliminar">
-                  <Trash2 size={15} />
-                </button>
+              <div className="payment-list-end">
+                <div className={`payment-list-amounts ${isPaid ? 'is-paid' : ''}`}>
+                  <span className={`payment-list-amount ${isPaid ? 'struck' : ''}`}>{formatCurrency(p.amount)}</span>
+                  {abono > 0 && !isPaid && (
+                    <>
+                      <span className="payment-list-abono">Abono {formatCurrency(abono)}</span>
+                      <span className="payment-list-remaining">Falta {formatCurrency(remaining)}</span>
+                    </>
+                  )}
+                </div>
+                <div className="payment-actions">
+                  <button type="button" className="payment-action-btn payment-action-abono" onClick={(e) => openAbono(p, e)} aria-label="Abono" title="Registrar abono">
+                    <Banknote size={15} />
+                  </button>
+                  <button type="button" className="payment-action-btn" onClick={(e) => openEdit(p, e)} aria-label="Editar">
+                    <Pencil size={15} />
+                  </button>
+                  <button type="button" className="payment-action-btn payment-action-delete" onClick={(e) => handleDelete(p.id, e)} aria-label="Eliminar">
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -400,6 +444,38 @@ export function PaymentsPage() {
 
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} title="Nuevo pago" subtitle="Se repetirá solo si lo marcas como mensual" wide>
         <PaymentForm form={form} setForm={setForm} onSubmit={handleCreate} submitLabel="Guardar pago" saving={saving} />
+      </Dialog>
+
+      <Dialog
+        open={!!abonoTarget}
+        onClose={() => !abonoSaving && setAbonoTarget(null)}
+        title="Registrar abono"
+        subtitle={abonoTarget?.concept}
+      >
+        {abonoTarget && (
+          <form onSubmit={saveAbono}>
+            <p className="payment-abono-hint">
+              Monto del pago: <strong>{formatCurrency(abonoTarget.amount)}</strong>
+            </p>
+            <div className="form-group">
+              <label>Total abonado hasta ahora</label>
+              <MoneyInput value={abonoAmount} onChange={setAbonoAmount} />
+            </div>
+            {abonoAmount > 0 && (
+              <p className="payment-abono-preview">
+                Falta por pagar: <strong>{formatCurrency(Math.max(parseFloat(abonoTarget.amount) - abonoAmount, 0))}</strong>
+              </p>
+            )}
+            <div className="goal-edit-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setAbonoTarget(null)} disabled={abonoSaving}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={abonoSaving}>
+                {abonoSaving ? 'Guardando…' : 'Guardar abono'}
+              </button>
+            </div>
+          </form>
+        )}
       </Dialog>
 
       <Dialog
@@ -426,8 +502,6 @@ export function PaymentsPage() {
           onApplyToAllChange={setApplyToAllRecurring}
         />
       </Dialog>
-
-      <DebtsDialog open={debtsOpen} onClose={() => setDebtsOpen(false)} />
     </div>
   );
 }
